@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Process, Data & Perspective — Aishwarya Baluri</title>
+  <meta name="description" content="Insights on process mining, enterprise analytics, and career growth — by Aishwarya Baluri." />
+  <meta name="author" content="Aishwarya Baluri" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: #0e0e0e; color: #e8e4df; font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+    ::selection { background: rgba(212,175,55,0.3); color: #fff; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #141414; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+    #root { min-height: 100vh; }
+
+    /* Animations */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+    /* Grain overlay */
+    .grain { position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* Hero */
+    .hero { position: relative; padding: 80px 40px 60px; border-bottom: 1px solid rgba(255,255,255,0.06); overflow: hidden; }
+    .hero-inner { max-width: 800px; margin: 0 auto; position: relative; z-index: 1; }
+    .hero-glow { position: absolute; top: -40px; left: -60px; width: 220px; height: 220px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,175,55,0.07) 0%, transparent 70%); pointer-events: none; }
+    .hero-eyebrow { font-size: 11px; letter-spacing: 4px; color: #d4af37; margin-bottom: 20px; font-weight: 500; }
+    .hero h1 { font-family: 'Instrument Serif', serif; font-size: clamp(40px, 7vw, 64px); font-weight: 400; line-height: 1.1; color: #f0ece4; margin-bottom: 24px; }
+    .hero h1 span { display: inline-block; animation: fadeUp 0.8s ease forwards; }
+    .hero h1 .line2 { animation-delay: 0.15s; opacity: 0; }
+    .hero h1 em { font-style: italic; color: #d4af37; }
+    .hero-sub { font-size: 17px; color: #888; line-height: 1.7; max-width: 550px; font-weight: 300; }
+    .hero-meta { margin-top: 28px; font-size: 13px; color: #555; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .hero-meta .dot { color: #d4af37; }
+    .hero-accent { position: absolute; bottom: 0; right: 10%; width: 300px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3), transparent); }
+
+    /* Toolbar */
+    .toolbar { max-width: 960px; margin: 0 auto; padding: 28px 40px; display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 16px; }
+    .categories { display: flex; gap: 8px; flex-wrap: wrap; }
+    .cat-btn { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 6px 16px; border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #777; cursor: pointer;
+      font-weight: 400; letter-spacing: 0.3px; transition: all 0.25s ease; }
+    .cat-btn:hover { color: #d4af37; border-color: rgba(212,175,55,0.4); }
+    .cat-btn.active { color: #d4af37; border-color: rgba(212,175,55,0.5); background: rgba(212,175,55,0.08); }
+    .new-post-btn { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 8px 22px;
+      border-radius: 6px; border: 1px solid rgba(212,175,55,0.5); background: rgba(212,175,55,0.1);
+      color: #d4af37; cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s ease; }
+    .new-post-btn:hover { background: rgba(212,175,55,0.18); transform: scale(1.03); }
+
+    /* Save indicator */
+    .save-toast { position: fixed; top: 20px; right: 20px; z-index: 1000; background: rgba(212,175,55,0.15);
+      border: 1px solid rgba(212,175,55,0.3); border-radius: 8px; padding: 8px 16px; font-size: 13px;
+      color: #d4af37; animation: fadeIn 0.3s ease; pointer-events: none; }
+
+    /* Editor */
+    .editor-wrap { max-width: 960px; margin: 0 auto; padding: 0 40px 32px; animation: fadeUp 0.4s ease; }
+    .editor { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+      padding: 32px; display: flex; flex-direction: column; gap: 20px; }
+    .editor h2 { font-family: 'Instrument Serif', serif; font-size: 24px; color: #f0ece4; font-weight: 400; }
+    .editor-row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .editor-row > :first-child { flex: 1; min-width: 200px; }
+    .editor-row > :last-child { width: 200px; }
+    .label { font-size: 12px; color: #777; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;
+      display: block; font-weight: 500; }
+    .label .hint { color: #555; font-weight: 300; text-transform: none; letter-spacing: 0; }
+    .field { width: 100%; font-family: 'DM Sans', sans-serif; font-size: 15px; padding: 12px 16px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #e8e4df;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+    .field:focus { outline: none; border-color: rgba(212,175,55,0.5); box-shadow: 0 0 0 2px rgba(212,175,55,0.1); }
+    textarea.field { resize: vertical; line-height: 1.7; min-height: 200px; }
+    select.field { cursor: pointer; -webkit-appearance: none; }
+    .editor-actions { display: flex; gap: 12px; justify-content: flex-end; }
+    .btn-cancel { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 10px 20px; border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #888; cursor: pointer;
+      transition: all 0.2s ease; }
+    .btn-cancel:hover { border-color: rgba(255,255,255,0.2); color: #aaa; }
+    .btn-publish { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 10px 28px;
+      border-radius: 6px; border: none; background: linear-gradient(135deg, #d4af37, #c49b2a); color: #0e0e0e;
+      cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s ease; }
+    .btn-publish:hover { transform: scale(1.03); filter: brightness(1.1); }
+    .btn-publish:disabled { opacity: 0.35; cursor: default; transform: none; filter: none; }
+
+    /* Posts */
+    .posts-section { max-width: 960px; margin: 0 auto; padding: 0 40px 60px; }
+    .empty { text-align: center; padding: 80px 20px; }
+    .empty p:first-child { font-size: 48px; margin-bottom: 16px; }
+    .empty p:last-child { color: #666; font-size: 15px; }
+    .posts-grid { display: flex; flex-direction: column; gap: 24px; }
+
+    /* Post card */
+    .post-card { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
+      padding: 28px; animation: fadeUp 0.5s ease both; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; }
+    .post-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.35); border-color: rgba(212,175,55,0.2); }
+    .post-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .badge { font-size: 11px; font-weight: 500; letter-spacing: 0.8px; padding: 4px 12px; border-radius: 12px;
+      border: 1px solid; text-transform: uppercase; }
+    .badge-pm { background: rgba(212,175,55,0.15); color: #d4af37; border-color: rgba(212,175,55,0.3); }
+    .badge-career { background: rgba(120,200,160,0.15); color: #78c8a0; border-color: rgba(120,200,160,0.3); }
+    .badge-tech { background: rgba(140,170,220,0.15); color: #8caadc; border-color: rgba(140,170,220,0.3); }
+    .badge-industry { background: rgba(200,140,180,0.15); color: #c88cb4; border-color: rgba(200,140,180,0.3); }
+    .read-time { font-size: 12px; color: #555; font-weight: 300; }
+    .post-title { font-family: 'Instrument Serif', serif; font-size: 24px; color: #f0ece4; font-weight: 400;
+      line-height: 1.3; margin-bottom: 12px; cursor: pointer; transition: color 0.2s ease; }
+    .post-title:hover { color: #d4af37; }
+    .post-excerpt { font-size: 14.5px; color: #888; line-height: 1.7; font-weight: 300; margin-bottom: 20px; }
+    .post-content { margin-bottom: 20px; animation: fadeIn 0.3s ease; }
+    .post-content p { font-size: 15px; color: #aaa; line-height: 1.85; font-weight: 300; margin-bottom: 18px; }
+    .post-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.05); flex-wrap: wrap; gap: 8px; }
+    .post-date { font-size: 12px; color: #555; }
+    .post-actions { display: flex; gap: 8px; }
+    .post-action { font-family: 'DM Sans', sans-serif; font-size: 12px; color: #d4af37; background: none;
+      border: 1px solid rgba(212,175,55,0.2); padding: 5px 14px; border-radius: 5px; cursor: pointer;
+      letter-spacing: 0.3px; transition: all 0.2s ease; }
+    .post-action:hover { background: rgba(212,175,55,0.08); border-color: rgba(212,175,55,0.4); transform: scale(1.03); }
+    .post-action.delete { color: #884444; border-color: rgba(136,68,68,0.2); }
+    .post-action.delete:hover { background: rgba(136,68,68,0.08); border-color: rgba(136,68,68,0.4); }
+
+    /* Footer */
+    .footer { padding: 0 40px 48px; max-width: 960px; margin: 0 auto; }
+    .footer-line { height: 1px; background: linear-gradient(90deg, transparent, rgba(212,175,55,0.2), transparent); margin-bottom: 32px; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; }
+    .footer-brand { font-family: 'Instrument Serif', serif; font-size: 18px; color: #555; margin-bottom: 6px; }
+    .footer-copy { font-size: 12px; color: #444; }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { font-size: 13px; color: #666; text-decoration: none; letter-spacing: 0.3px; transition: color 0.2s ease; }
+    .footer-links a:hover { color: #d4af37; }
+
+    /* Mobile */
+    @media (max-width: 640px) {
+      .hero { padding: 50px 24px 40px; }
+      .toolbar { padding: 20px 24px; }
+      .editor-wrap { padding: 0 24px 24px; }
+      .editor { padding: 20px; }
+      .editor-row { flex-direction: column; }
+      .editor-row > :last-child { width: 100%; }
+      .posts-section { padding: 0 24px 40px; }
+      .post-card { padding: 20px; }
+      .post-title { font-size: 20px; }
+      .footer { padding: 0 24px 36px; }
+      .hero-meta { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const CATEGORIES = ["All", "Process Mining", "Career", "Technical", "Industry Insights"];
+
+    const SAMPLE_POSTS = [
+      {
+        id: "post_001",
+        title: "Every Process Looks Efficient — Until You Mine the Data",
+        excerpt: "Most organizations design their workflows on paper and assume execution follows the same path. In practice, it rarely does.",
+        content: "Most organizations design their workflows on paper and assume execution follows the same path. In practice, it rarely does.\n\nThrough my work in enterprise process mining using ARIS PPM, I've seen firsthand how process execution data exposes what status reports and flowcharts cannot — hidden bottlenecks silently adding days to cycle times, process deviations where actual execution diverges from designed workflows, and blind spots where no performance measurement exists at all.\n\nThe real value isn't just in discovering these gaps — it's in converting them into measurable KPIs, interactive dashboards, and data-backed recommendations that leadership can act on.\n\nProcess mining doesn't replace process design. It pressure-tests it against reality.",
+        category: "Process Mining",
+        date: "2026-02-20",
+        readTime: "4 min read"
+      },
+      {
+        id: "post_002",
+        title: "From Software Development to Process Mining — Why I Made the Shift",
+        excerpt: "Career transitions aren't always linear. Sometimes the most valuable moves are the ones that connect seemingly different disciplines.",
+        content: "Career transitions aren't always linear. Sometimes the most valuable moves are the ones that connect seemingly different disciplines.\n\nMy journey from software development into process mining wasn't accidental — it was a deliberate move toward work that combines technical depth with business impact. As a developer, I built systems. As a process analyst, I understand how those systems are actually used, where they break down, and how to make them better.\n\nThe skills transfer more than you'd think. SQL, data modeling, system architecture — all of it feeds directly into process mining work. But what changed was my perspective: I stopped thinking in code and started thinking in processes.\n\nThat shift — from building tools to understanding how organizations actually operate — is what makes process mining so compelling.",
+        category: "Career",
+        date: "2026-02-15",
+        readTime: "5 min read"
+      },
+      {
+        id: "post_003",
+        title: "5 Things Your Process KPIs Are Probably Missing",
+        excerpt: "Most KPI frameworks measure what's easy to count, not what actually matters. Here's what I've learned from building dashboards for enterprise operations.",
+        content: "Most KPI frameworks measure what's easy to count, not what actually matters. Here's what I've learned from building KPI dashboards in ARIS Aware for enterprise operations.\n\n1. Deviation Rate from Happy Path — You're tracking cycle time, but are you measuring how often the process actually follows the designed flow? Deviation rate tells you whether your process model reflects reality.\n\n2. Rework Loops — How many times does a case bounce back to a previous step? This is invisible in aggregate metrics but devastating to throughput.\n\n3. Waiting Time vs. Processing Time — Total cycle time is misleading. Break it down. In most processes I've analyzed, 60-80% of cycle time is pure waiting.\n\n4. First-Pass Yield — What percentage of cases complete without any rework or exception handling? This is the real efficiency metric.\n\n5. Bottleneck Concentration — Which single step holds up the most cases? One bottleneck often causes more delay than all other steps combined.",
+        category: "Technical",
+        date: "2026-02-10",
+        readTime: "6 min read"
+      }
+    ];
+
+    const BADGE_CLASS = {
+      "Process Mining": "badge-pm",
+      "Career": "badge-career",
+      "Technical": "badge-tech",
+      "Industry Insights": "badge-industry",
+    };
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr + "T00:00:00");
+      return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    }
+
+    function loadFromStorage() {
+      try {
+        const data = localStorage.getItem("blog-posts");
+        if (data) return JSON.parse(data);
+      } catch (e) {}
+      return null;
+    }
+
+    function saveToStorage(posts) {
+      try { localStorage.setItem("blog-posts", JSON.stringify(posts)); } catch (e) {}
+    }
+
+    function Blog() {
+      const [posts, setPosts] = useState([]);
+      const [activeCategory, setActiveCategory] = useState("All");
+      const [showEditor, setShowEditor] = useState(false);
+      const [editingPost, setEditingPost] = useState(null);
+      const [expandedPost, setExpandedPost] = useState(null);
+      const [saving, setSaving] = useState(false);
+      const [formData, setFormData] = useState({ title: "", excerpt: "", content: "", category: "Process Mining" });
+      const editorRef = useRef(null);
+
+      useEffect(() => {
+        const stored = loadFromStorage();
+        if (stored && stored.length > 0) {
+          setPosts(stored);
+        } else {
+          setPosts(SAMPLE_POSTS);
+          saveToStorage(SAMPLE_POSTS);
+        }
+      }, []);
+
+      function doSave(newPosts) {
+        setPosts(newPosts);
+        saveToStorage(newPosts);
+        setSaving(true);
+        setTimeout(() => setSaving(false), 800);
+      }
+
+      function handleSubmit() {
+        if (!formData.title.trim() || !formData.content.trim()) return;
+        const words = formData.content.split(/\s+/).length;
+        const readTime = Math.max(1, Math.ceil(words / 200)) + " min read";
+        if (editingPost) {
+          doSave(posts.map(p => p.id === editingPost.id ? { ...p, ...formData, readTime } : p));
+        } else {
+          const np = { id: "post_" + Date.now(), ...formData,
+            excerpt: formData.excerpt || formData.content.substring(0, 150) + "...",
+            date: new Date().toISOString().split("T")[0], readTime };
+          doSave([np, ...posts]);
+        }
+        resetEditor();
+      }
+
+      function handleDelete(id) {
+        if (!confirm("Delete this post?")) return;
+        doSave(posts.filter(p => p.id !== id));
+        if (expandedPost && expandedPost.id === id) setExpandedPost(null);
+      }
+
+      function handleEdit(post) {
+        setEditingPost(post);
+        setFormData({ title: post.title, excerpt: post.excerpt, content: post.content, category: post.category });
+        setShowEditor(true);
+        setExpandedPost(null);
+        setTimeout(() => { if (editorRef.current) editorRef.current.scrollIntoView({ behavior: "smooth", block: "start" }); }, 100);
+      }
+
+      function resetEditor() {
+        setShowEditor(false);
+        setEditingPost(null);
+        setFormData({ title: "", excerpt: "", content: "", category: "Process Mining" });
+      }
+
+      const filtered = activeCategory === "All" ? posts : posts.filter(p => p.category === activeCategory);
+
+      return (
+        <React.Fragment>
+          {saving && <div className="save-toast">✓ Saved</div>}
+
+          {/* Hero */}
+          <header className="hero">
+            <div className="hero-inner">
+              <div className="hero-glow" />
+              <p className="hero-eyebrow">BLOG</p>
+              <h1>
+                <span>Process, Data</span><br/>
+                <span className="line2"><em>&amp;</em> Perspective</span>
+              </h1>
+              <p className="hero-sub">Insights on process mining, enterprise analytics, and career growth — from the field.</p>
+              <div className="hero-meta">
+                <span>By Aishwarya Baluri</span>
+                <span className="dot">·</span>
+                <span>Senior Process Analyst</span>
+                <span className="dot">·</span>
+                <span>ARIS · SAP · Power BI</span>
+              </div>
+            </div>
+            <div className="hero-accent" />
+          </header>
+
+          {/* Toolbar */}
+          <div className="toolbar">
+            <div className="categories">
+              {CATEGORIES.map(cat => (
+                <button key={cat} className={"cat-btn" + (activeCategory === cat ? " active" : "")}
+                  onClick={() => setActiveCategory(cat)}>{cat}</button>
+              ))}
+            </div>
+            <button className="new-post-btn" onClick={() => { resetEditor(); setShowEditor(!showEditor); }}>
+              {showEditor ? "✕ Cancel" : "+ New Post"}
+            </button>
+          </div>
+
+          {/* Editor */}
+          {showEditor && (
+            <div className="editor-wrap" ref={editorRef}>
+              <div className="editor">
+                <h2>{editingPost ? "Edit Post" : "New Post"}</h2>
+                <div className="editor-row">
+                  <div>
+                    <label className="label">Title</label>
+                    <input className="field" value={formData.title} placeholder="Your post title..."
+                      onChange={e => setFormData({...formData, title: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="label">Category</label>
+                    <select className="field" value={formData.category}
+                      onChange={e => setFormData({...formData, category: e.target.value})}>
+                      {CATEGORIES.filter(c => c !== "All").map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="label">Excerpt <span className="hint">(optional — auto-generated if empty)</span></label>
+                  <input className="field" value={formData.excerpt} placeholder="Brief summary..."
+                    onChange={e => setFormData({...formData, excerpt: e.target.value})} />
+                </div>
+                <div>
+                  <label className="label">Content</label>
+                  <textarea className="field" rows="10" value={formData.content}
+                    placeholder="Write your post here... (use double line breaks for paragraphs)"
+                    onChange={e => setFormData({...formData, content: e.target.value})} />
+                </div>
+                <div className="editor-actions">
+                  <button className="btn-cancel" onClick={resetEditor}>Cancel</button>
+                  <button className="btn-publish" disabled={!formData.title.trim() || !formData.content.trim()}
+                    onClick={handleSubmit}>{editingPost ? "Update Post" : "Publish"}</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Posts */}
+          <main className="posts-section">
+            {filtered.length === 0 ? (
+              <div className="empty">
+                <p>∅</p>
+                <p>{activeCategory === "All" ? "No posts yet. Write your first one!" : 'No posts in "' + activeCategory + '" yet.'}</p>
+              </div>
+            ) : (
+              <div className="posts-grid">
+                {filtered.map((post, i) => (
+                  <article key={post.id} className="post-card" style={{animationDelay: (i * 0.08) + "s"}}>
+                    <div className="post-head">
+                      <span className={"badge " + (BADGE_CLASS[post.category] || "")}>{post.category}</span>
+                      <span className="read-time">{post.readTime}</span>
+                    </div>
+                    <h3 className="post-title" onClick={() => setExpandedPost(expandedPost && expandedPost.id === post.id ? null : post)}>
+                      {post.title}
+                    </h3>
+                    {expandedPost && expandedPost.id === post.id ? (
+                      <div className="post-content">
+                        {post.content.split("\n\n").map((para, j) => <p key={j}>{para}</p>)}
+                      </div>
+                    ) : (
+                      <p className="post-excerpt">{post.excerpt}</p>
+                    )}
+                    <div className="post-footer">
+                      <span className="post-date">{formatDate(post.date)}</span>
+                      <div className="post-actions">
+                        <button className="post-action" onClick={() => setExpandedPost(expandedPost && expandedPost.id === post.id ? null : post)}>
+                          {expandedPost && expandedPost.id === post.id ? "Collapse" : "Read"}
+                        </button>
+                        <button className="post-action" onClick={() => handleEdit(post)}>Edit</button>
+                        <button className="post-action delete" onClick={() => handleDelete(post.id)}>Delete</button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </main>
+
+          {/* Footer */}
+          <footer className="footer">
+            <div className="footer-line" />
+            <div className="footer-inner">
+              <div>
+                <p className="footer-brand">Process, Data &amp; Perspective</p>
+                <p className="footer-copy">© {new Date().getFullYear()} Aishwarya Baluri</p>
+              </div>
+              <div className="footer-links">
+                <a href="mailto:aishwaryab.career@gmail.com">Email</a>
+                <a href="https://www.linkedin.com/in/aishwaryabaluri" target="_blank" rel="noreferrer">LinkedIn</a>
+              </div>
+            </div>
+          </footer>
+        </React.Fragment>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<Blog />);
+  </script>
+</body>
+</html>
